@@ -1,0 +1,23 @@
+{
+  "name": "razorpay-gateway",
+  "version": "1.0.0",
+  "description": "Minimal Node.js + Express backend with Razorpay integration and signature verification",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/verify.test.js"
+  },
+  "keywords": [
+    "razorpay",
+    "express",
+    "payment-gateway",
+    "webhook"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "razorpay": "^2.9.5"
+  }
+}
