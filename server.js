@@ -62,6 +62,16 @@ app.post('/create-order', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Valid amount in INR is required' });
     }
 
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!keyId || !keySecret || keyId.trim() === '' || keySecret.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Razorpay API keys (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET) are missing or blank in .env. Please configure valid test keys.',
+      });
+    }
+
     const razorpay = getRazorpayInstance();
     const options = {
       amount: Math.round(parsedAmount * 100), // paise
@@ -73,11 +83,21 @@ app.post('/create-order', async (req, res) => {
 
     return res.status(200).json({
       order,
-      key_id: process.env.RAZORPAY_KEY_ID || 'dummy_key_id',
+      key_id: keyId,
     });
   } catch (error) {
     console.error('Error creating order:', error);
-    return res.status(500).json({ success: false, message: error.message || 'Failed to create order' });
+    let message = 'Failed to create order';
+    if (error && error.error && error.error.description) {
+      message = error.error.description;
+    } else if (error && error.message) {
+      if (error.message.includes("Cannot read properties of undefined (reading 'status')")) {
+        message = 'Razorpay connection failed. Please verify your internet connection and credentials in .env.';
+      } else {
+        message = error.message;
+      }
+    }
+    return res.status(500).json({ success: false, message });
   }
 });
 
